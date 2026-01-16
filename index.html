@@ -8,11 +8,22 @@
 body {
   margin: 0;
   background: transparent;
-  font-family: Arial, sans-serif;
   overflow: hidden;
+  font-family: Arial, sans-serif;
 }
 
-/* Контейнер алерта */
+/* КНОПКА ТЕСТА */
+#testBtn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  padding: 10px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* АЛЕРТ */
 #alert {
   display: none;
   position: absolute;
@@ -21,83 +32,62 @@ body {
   text-align: center;
 }
 
-/* Гифка */
 #alert img {
   width: 220px;
+  border-radius: 10px;
 }
 
-/* Основной текст */
 #alert-text {
-  margin-top: 10px;
-  font-size: 22px;
-  font-weight: bold;
-  color: black; /* ← ЧЁРНЫЙ ТЕКСТ */
-}
-
-/* Сообщение доната */
-#alert-message {
-  margin-top: 6px;
+  color: black;
   font-size: 18px;
-  color: black; /* ← ЧЁРНЫЙ ТЕКСТ */
+  font-weight: bold;
+  margin-top: 8px;
 }
 
-/* Кнопка теста */
-#testBtn {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  padding: 10px 16px;
+#alert-message {
+  color: black;
   font-size: 14px;
-  border: none;
-  border-radius: 20px;
-  background: #eee;
-  cursor: pointer;
 }
 </style>
 </head>
 
 <body>
 
-<!-- АЛЕРТ -->
+<button id="testBtn" onclick="testDonate()">ТЕСТ ДОНАТА</button>
+
 <div id="alert">
-  <img src="alert.gif" alt="alert">
+  <img src="alert.gif" alt="alert gif">
   <div id="alert-text"></div>
   <div id="alert-message"></div>
 </div>
 
-<!-- КНОПКА ТЕСТА -->
-<button id="testBtn" onclick="testDonate()">ТЕСТ ДОНАТА</button>
+<!-- 🔊 ЗВУК -->
+<audio id="alertSound" src="alert.mp3"></audio>
 
 <script>
 function showAlert(name, amount, message) {
   const alertBox = document.getElementById("alert");
+  const sound = document.getElementById("alertSound");
 
   document.getElementById("alert-text").innerText =
     `${name} задонатил ${amount} ⭐`;
-
   document.getElementById("alert-message").innerText = message;
 
   alertBox.style.display = "block";
 
-  // скрыть через 9 секунд
+  // 🔊 воспроизведение звука
+  sound.currentTime = 0;
+  sound.play();
+
+  // ⏱ длительность 9 секунд
   setTimeout(() => {
     alertBox.style.display = "none";
   }, 9000);
 }
 
-// ТЕСТОВАЯ КНОПКА
+// кнопка теста
 function testDonate() {
   showAlert("Тестер", 50, "Проверка гифки");
-}
-
-// Приём данных от бота (?name=&amount=&message=)
-const params = new URLSearchParams(window.location.search);
-if (params.has("name")) {
-  showAlert(
-    params.get("name"),
-    params.get("amount"),
-    params.get("message")
-  );
 }
 </script>
 
