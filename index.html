@@ -3,77 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <title>Donate Alerts</title>
+
 <style>
 body {
-    margin: 0;
-    background: transparent;
-    overflow: hidden;
-    font-family: Arial, sans-serif;
+  margin: 0;
+  background: transparent;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
 }
+
 #alert {
-    position: absolute;
-    top: 40%;
-    width: 100%;
-    text-align: center;
-    display: none;
-    color: white;
-    text-shadow: 0 0 10px black;
+  display: none;
+  position: absolute;
+  top: 40%;
+  width: 100%;
+  text-align: center;
+  color: white;
+  text-shadow: 0 0 10px black;
 }
-#name {
-    font-size: 36px;
-    font-weight: bold;
+
+#alert img {
+  width: 300px;
 }
-#amount {
-    font-size: 28px;
-    color: gold;
-}
-#message {
-    font-size: 24px;
-    margin-top: 10px;
-}
-img {
-    width: 200px;
+
+#text {
+  font-size: 28px;
+  margin-top: 10px;
 }
 </style>
 </head>
+
 <body>
 
 <div id="alert">
-    <img src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif">
-    <div id="name"></div>
-    <div id="amount"></div>
-    <div id="message"></div>
+  <img src="alert.gif">
+  <div id="text"></div>
 </div>
 
 <script>
-const alertBox = document.getElementById("alert");
+let lastId = 0;
 
-function showDonate(name, amount, message) {
-    document.getElementById("name").innerText = name + " задонатил!";
-    document.getElementById("amount").innerText = amount + " ⭐";
-    document.getElementById("message").innerText = message;
+async function checkAlerts() {
+  try {
+    const res = await fetch("alerts.json?_=" + Date.now());
+    const data = await res.json();
 
-    alertBox.style.display = "block";
-
-    // TTS
-    let speech = new SpeechSynthesisUtterance(
-        name + " задонатил " + amount + " звезд. " + message
-    );
-    speech.lang = "ru-RU";
-    speechSynthesis.speak(speech);
-
-    setTimeout(() => {
-        alertBox.style.display = "none";
-    }, 7000);
+    if (data.id !== lastId) {
+      lastId = data.id;
+      showAlert(data.name, data.amount, data.message);
+    }
+  } catch (e) {}
 }
 
-// 🔴 ПОЛУЧЕНИЕ ДОНАТОВ
-const socket = new WebSocket("ws://localhost:8765");
+function showAlert(name, amount, message) {
+  const alert = document.getElementById("alert");
+  const text = document.getElementById("text");
 
-socket.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    showDonate(data.name, data.amount, data.message);
-};
+  text.innerText = `${name} задонатил ${amount} ⭐\n${message}`;
+  alert.style.display = "block";
+
+  setTimeout(() => {
+    alert.style.display = "none";
+  }, 6000);
+}
+
+setInterval(checkAlerts, 2000);
 </script>
 
 </body>
