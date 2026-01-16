@@ -8,70 +8,96 @@
 body {
   margin: 0;
   background: transparent;
-  overflow: hidden;
   font-family: Arial, sans-serif;
+  overflow: hidden;
 }
 
+/* Контейнер алерта */
 #alert {
   display: none;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 40%;
+  width: 100%;
   text-align: center;
-  color: white;
-  text-shadow: 0 0 10px black;
 }
 
+/* Гифка */
 #alert img {
-  width: 300px;
+  width: 220px;
 }
 
+/* Основной текст */
 #alert-text {
   margin-top: 10px;
-  font-size: 26px;
+  font-size: 22px;
   font-weight: bold;
+  color: black; /* ← ЧЁРНЫЙ ТЕКСТ */
+}
+
+/* Сообщение доната */
+#alert-message {
+  margin-top: 6px;
+  font-size: 18px;
+  color: black; /* ← ЧЁРНЫЙ ТЕКСТ */
+}
+
+/* Кнопка теста */
+#testBtn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  padding: 10px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 20px;
+  background: #eee;
+  cursor: pointer;
 }
 </style>
 </head>
 
 <body>
 
+<!-- АЛЕРТ -->
 <div id="alert">
-  <img src="alert.gif">
+  <img src="alert.gif" alt="alert">
   <div id="alert-text"></div>
+  <div id="alert-message"></div>
 </div>
 
-<audio id="alertSound" src="alert.mp3"></audio>
+<!-- КНОПКА ТЕСТА -->
+<button id="testBtn" onclick="testDonate()">ТЕСТ ДОНАТА</button>
 
 <script>
-const params = new URLSearchParams(window.location.search);
-
-if (params.has("name")) {
-  const name = params.get("name");
-  const amount = params.get("amount");
-
-  playAlert(name, amount);
-
-  // убираем параметры
-  history.replaceState({}, "", location.pathname);
-}
-
-function playAlert(name, amount) {
+function showAlert(name, amount, message) {
   const alertBox = document.getElementById("alert");
-  const text = document.getElementById("alert-text");
-  const sound = document.getElementById("alertSound");
 
-  text.innerHTML = `${name} задонатил ${amount} ⭐`;
+  document.getElementById("alert-text").innerText =
+    `${name} задонатил ${amount} ⭐`;
+
+  document.getElementById("alert-message").innerText = message;
+
   alertBox.style.display = "block";
 
-  sound.currentTime = 0;
-  sound.volume = 1.0;
-  sound.play();
-
+  // скрыть через 9 секунд
   setTimeout(() => {
     alertBox.style.display = "none";
-  }, 9000); // ⏱ 9 секунд
+  }, 9000);
+}
+
+// ТЕСТОВАЯ КНОПКА
+function testDonate() {
+  showAlert("Тестер", 50, "Проверка гифки");
+}
+
+// Приём данных от бота (?name=&amount=&message=)
+const params = new URLSearchParams(window.location.search);
+if (params.has("name")) {
+  showAlert(
+    params.get("name"),
+    params.get("amount"),
+    params.get("message")
+  );
 }
 </script>
 
