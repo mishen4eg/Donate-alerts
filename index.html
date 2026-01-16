@@ -2,90 +2,78 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Donate Alert</title>
-
+<title>Donate Alerts</title>
 <style>
 body {
-  margin: 0;
-  background: transparent;
-  overflow: hidden;
-  font-family: Arial, sans-serif;
+    margin: 0;
+    background: transparent;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
 }
-
 #alert {
-  display: none;
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  color: white;
+    position: absolute;
+    top: 40%;
+    width: 100%;
+    text-align: center;
+    display: none;
+    color: white;
+    text-shadow: 0 0 10px black;
 }
-
-#alert img {
-  width: 400px;
+#name {
+    font-size: 36px;
+    font-weight: bold;
 }
-
-#text {
-  margin-top: 20px;
-  font-size: 36px;
-  text-shadow: 0 0 10px black;
+#amount {
+    font-size: 28px;
+    color: gold;
+}
+#message {
+    font-size: 24px;
+    margin-top: 10px;
+}
+img {
+    width: 200px;
 }
 </style>
 </head>
-
 <body>
 
 <div id="alert">
-  <img src="alert.gif">
-  <div id="text"></div>
+    <img src="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif">
+    <div id="name"></div>
+    <div id="amount"></div>
+    <div id="message"></div>
 </div>
 
 <script>
-const queue = [];
-let playing = false;
+const alertBox = document.getElementById("alert");
 
-function playTTS(text) {
-  const msg = new SpeechSynthesisUtterance(text);
-  msg.lang = 'ru-RU';
-  speechSynthesis.speak(msg);
+function showDonate(name, amount, message) {
+    document.getElementById("name").innerText = name + " задонатил!";
+    document.getElementById("amount").innerText = amount + " ⭐";
+    document.getElementById("message").innerText = message;
+
+    alertBox.style.display = "block";
+
+    // TTS
+    let speech = new SpeechSynthesisUtterance(
+        name + " задонатил " + amount + " звезд. " + message
+    );
+    speech.lang = "ru-RU";
+    speechSynthesis.speak(speech);
+
+    setTimeout(() => {
+        alertBox.style.display = "none";
+    }, 7000);
 }
 
-function showAlert(data) {
-  queue.push(data);
-  if (!playing) next();
-}
+// 🔴 ПОЛУЧЕНИЕ ДОНАТОВ
+const socket = new WebSocket("ws://localhost:8765");
 
-function next() {
-  if (queue.length === 0) {
-    playing = false;
-    return;
-  }
-
-  playing = true;
-  const d = queue.shift();
-
-  document.getElementById("text").innerText =
-    `${d.user} задонатил ${d.amount} ⭐\n${d.message}`;
-
-  document.getElementById("alert").style.display = "block";
-
-  playTTS(`${d.user} задонатил ${d.amount} звёзд. ${d.message}`);
-
-  setTimeout(() => {
-    document.getElementById("alert").style.display = "none";
-    next();
-  }, 8000);
-}
-
-/* ТЕСТ */
-setTimeout(() => {
-  showAlert({
-    user: "Тестер",
-    amount: 100,
-    message: "Если ты это видишь — всё работает!"
-  });
-}, 2000);
+socket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    showDonate(data.name, data.amount, data.message);
+};
 </script>
 
 </body>
