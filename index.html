@@ -1,89 +1,79 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Donate Alert</title>
+<meta charset="UTF-8">
+<title>Donate Alert</title>
 
-  <style>
-    body {
-      margin: 0;
-      background: transparent;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-    }
+<style>
+body {
+  margin: 0;
+  background: transparent;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
 
-    #alert {
-      display: none;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      color: black;
-      text-shadow: 0 0 10px black;
-      animation: fadeIn 0.5s ease;
-    }
+#alert {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+  text-shadow: 0 0 10px black;
+}
 
-    #alert img {
-      width: 300px;
-      border-radius: 10px;
-    }
+#alert img {
+  width: 300px;
+}
 
-    #alert-text {
-      margin-top: 10px;
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translate(-50%, -60%); }
-      to { opacity: 1; transform: translate(-50%, -50%); }
-    }
-
-    button {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-  </style>
+#alert-text {
+  margin-top: 10px;
+  font-size: 26px;
+  font-weight: bold;
+}
+</style>
 </head>
 
 <body>
 
-  <!-- АЛЕРТ -->
-  <div id="alert">
-    <img src="alert.gif" alt="alert gif">
-    <div id="alert-text">
-      Тестер задонатил 50 ⭐<br>
-      Проверка гифки
-    </div>
-  </div>
+<div id="alert">
+  <img src="alert.gif">
+  <div id="alert-text"></div>
+</div>
 
-  <!-- ЗВУК -->
-  <audio id="alertSound" src="alert.mp3"></audio>
+<audio id="alertSound" src="alert.mp3"></audio>
 
-  <!-- КНОПКА ДЛЯ ТЕСТА -->
-  <button onclick="playAlert()">ТЕСТ ДОНАТА</button>
+<script>
+const params = new URLSearchParams(window.location.search);
 
-  <script>
-    function playAlert() {
-      const alertBox = document.getElementById("alert");
-      const sound = document.getElementById("alertSound");
+if (params.has("name")) {
+  const name = params.get("name");
+  const amount = params.get("amount");
 
-      sound.currentTime = 0;
-      sound.volume = 1.0;
-      sound.play();
+  playAlert(name, amount);
 
-      alertBox.style.display = "block";
+  // убираем параметры
+  history.replaceState({}, "", location.pathname);
+}
 
-      setTimeout(() => {
-        alertBox.style.display = "none";
-      }, 9100);
-    }
-  </script>
+function playAlert(name, amount) {
+  const alertBox = document.getElementById("alert");
+  const text = document.getElementById("alert-text");
+  const sound = document.getElementById("alertSound");
+
+  text.innerHTML = `${name} задонатил ${amount} ⭐`;
+  alertBox.style.display = "block";
+
+  sound.currentTime = 0;
+  sound.volume = 1.0;
+  sound.play();
+
+  setTimeout(() => {
+    alertBox.style.display = "none";
+  }, 9000); // ⏱ 9 секунд
+}
+</script>
 
 </body>
 </html>
