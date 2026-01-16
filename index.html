@@ -6,88 +6,70 @@
 
 <style>
 body {
-  margin: 0;
-  background: transparent;
-  overflow: hidden;
-  font-family: Arial, sans-serif;
+    margin: 0;
+    background: transparent;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
 }
 
-/* КНОПКА ТЕСТА */
-#testBtn {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  padding: 10px 16px;
-  font-size: 14px;
-  cursor: pointer;
-  z-index: 10;
-}
-
-/* АЛЕРТ */
 #alert {
-  display: none;
-  position: absolute;
-  top: 40%;
-  width: 100%;
-  text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    text-align: center;
 }
 
 #alert img {
-  width: 220px;
-  border-radius: 10px;
+    width: 300px;
 }
 
-#alert-text {
-  color: black;
-  font-size: 18px;
-  font-weight: bold;
-  margin-top: 8px;
-}
-
-#alert-message {
-  color: black;
-  font-size: 14px;
+#text {
+    margin-top: 10px;
+    font-size: 28px;
+    color: black; /* чёрный текст */
+    font-weight: bold;
+    text-shadow: 0 0 4px white;
 }
 </style>
 </head>
 
 <body>
 
-<button id="testBtn" onclick="testDonate()">ТЕСТ ДОНАТА</button>
-
 <div id="alert">
-  <img src="alert.gif" alt="alert gif">
-  <div id="alert-text"></div>
-  <div id="alert-message"></div>
+    <!-- ГИФКА -->
+    <img src="gif.gif" alt="donate">
+    <div id="text"></div>
 </div>
 
-<!-- 🔊 ЗВУК -->
-<audio id="alertSound" src="alert.mp3"></audio>
+<!-- ЗВУК -->
+<audio id="sound" src="alert.mp3"></audio>
 
 <script>
-function showAlert(name, amount, message) {
-  const alertBox = document.getElementById("alert");
-  const sound = document.getElementById("alertSound");
+// слушаем сообщения от бота
+window.addEventListener("message", (event) => {
+    const data = event.data;
 
-  document.getElementById("alert-text").innerText =
-    `${name} задонатил ${amount} ⭐`;
-  document.getElementById("alert-message").innerText = message;
+    if (!data || !data.amount) return;
 
-  alertBox.style.display = "block";
+    showAlert(data.amount, data.text);
+});
 
-  // 🔊 воспроизведение звука
-  sound.currentTime = 0;
-  sound.play();
+function showAlert(amount, text) {
+    const alert = document.getElementById("alert");
+    const msg = document.getElementById("text");
+    const sound = document.getElementById("sound");
 
-  // ⏱ длительность 9 секунд
-  setTimeout(() => {
-    alertBox.style.display = "none";
-  }, 9000);
-}
+    msg.innerHTML = `⭐ ${amount}<br>${text}`;
 
-// кнопка теста
-function testDonate() {
-  showAlert("Тестер", 50, "Проверка гифки");
+    alert.style.display = "block";
+    sound.currentTime = 0;
+    sound.play();
+
+    setTimeout(() => {
+        alert.style.display = "none";
+    }, 9000); // ⏱ 9 секунд
 }
 </script>
 
