@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Donate Alert</title>
+
+<style>
+body {
+  margin: 0;
+  background: transparent;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+#alert {
+  display: none;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+}
+
+#alert img {
+  width: 400px;
+}
+
+#text {
+  margin-top: 20px;
+  font-size: 36px;
+  text-shadow: 0 0 10px black;
+}
+</style>
+</head>
+
+<body>
+
+<div id="alert">
+  <img src="alert.gif">
+  <div id="text"></div>
+</div>
+
+<script>
+const queue = [];
+let playing = false;
+
+function playTTS(text) {
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.lang = 'ru-RU';
+  speechSynthesis.speak(msg);
+}
+
+function showAlert(data) {
+  queue.push(data);
+  if (!playing) next();
+}
+
+function next() {
+  if (queue.length === 0) {
+    playing = false;
+    return;
+  }
+
+  playing = true;
+  const d = queue.shift();
+
+  document.getElementById("text").innerText =
+    `${d.user} задонатил ${d.amount} ⭐\n${d.message}`;
+
+  document.getElementById("alert").style.display = "block";
+
+  playTTS(`${d.user} задонатил ${d.amount} звёзд. ${d.message}`);
+
+  setTimeout(() => {
+    document.getElementById("alert").style.display = "none";
+    next();
+  }, 8000);
+}
+
+/* ТЕСТ */
+setTimeout(() => {
+  showAlert({
+    user: "Тестер",
+    amount: 100,
+    message: "Если ты это видишь — всё работает!"
+  });
+}, 2000);
+</script>
+
+</body>
+</html>
