@@ -1,75 +1,89 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>Donate Alert</title>
+  <meta charset="UTF-8">
+  <title>Donate Alert</title>
 
-<style>
-body {
-  margin: 0;
-  background: transparent;
-  overflow: hidden;
-  font-family: Arial, sans-serif;
-}
+  <style>
+    body {
+      margin: 0;
+      background: transparent;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
 
-#alert {
-  display: none;
-  position: absolute;
-  top: 40%;
-  width: 100%;
-  text-align: center;
-}
+    #alert {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: white;
+      text-shadow: 0 0 10px black;
+      animation: fadeIn 0.5s ease;
+    }
 
-#alert img {
-  width: 300px;
-}
+    #alert img {
+      width: 300px;
+      border-radius: 10px;
+    }
 
-#text {
-  margin-top: 10px;
-  font-size: 28px;
-  color: white;
-  text-shadow: 0 0 10px black;
-  white-space: pre-line;
-}
-</style>
+    #alert-text {
+      margin-top: 10px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translate(-50%, -60%); }
+      to { opacity: 1; transform: translate(-50%, -50%); }
+    }
+
+    button {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
 
-<div id="alert">
-  <img src="alert.gif">
-  <div id="text"></div>
-</div>
+  <!-- АЛЕРТ -->
+  <div id="alert">
+    <img src="alert.gif" alt="alert gif">
+    <div id="alert-text">
+      Тестер задонатил 50 ⭐<br>
+      Проверка гифки
+    </div>
+  </div>
 
-<script>
-let lastId = 0;
+  <!-- ЗВУК -->
+  <audio id="alertSound" src="alert.mp3"></audio>
 
-setInterval(async () => {
-  try {
-    const res = await fetch("alerts.json?_=" + Date.now());
-    const data = await res.json();
+  <!-- КНОПКА ДЛЯ ТЕСТА -->
+  <button onclick="playAlert()">ТЕСТ ДОНАТА</button>
 
-    if (data.id !== lastId && data.id !== 0) {
-      lastId = data.id;
-      showAlert(data);
+  <script>
+    function playAlert() {
+      const alertBox = document.getElementById("alert");
+      const sound = document.getElementById("alertSound");
+
+      sound.currentTime = 0;
+      sound.volume = 1.0;
+      sound.play();
+
+      alertBox.style.display = "block";
+
+      setTimeout(() => {
+        alertBox.style.display = "none";
+      }, 5000);
     }
-  } catch (e) {}
-}, 2000);
-
-function showAlert(data) {
-  const alert = document.getElementById("alert");
-  const text = document.getElementById("text");
-
-  text.innerText =
-    `${data.name} задонатил ${data.amount} ⭐\n${data.message}`;
-
-  alert.style.display = "block";
-
-  setTimeout(() => {
-    alert.style.display = "none";
-  }, 7000);
-}
-</script>
+  </script>
 
 </body>
 </html>
